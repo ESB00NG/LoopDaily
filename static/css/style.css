@@ -1,0 +1,181 @@
+/* Establece la fuente predeterminada para todo el cuerpo del documento */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #0a0a0a; /* Cambia el color de fondo a azul */
+}
+.container {
+    max-width: 1460px;
+}
+.title {
+    display: flex;
+    justify-content: center;
+}
+
+h1 {
+    color: white;
+    font-weight: 800;
+}
+.navbar-brand {
+    font-weight: 800;
+}
+/* Ajusta el tamaño de la fuente de los elementos de la barra de navegación, incluyendo el nombre de la marca y los enlaces */
+.navbar-brand, .nav-link {
+    font-size: 1.4rem; /* Puedes aumentar o disminuir este valor para cambiar el tamaño del texto en la barra de navegación */
+}
+
+.navbar {
+    background-color: #0a0a0a;
+    padding-top: 15px;
+    padding-left: 20px;
+}
+
+.nav-link {
+    color: white;
+}
+
+.form-label {
+    color: white;
+}
+.form-control {
+    background-color: black;
+    border-color: #4b209e;
+    width: 200px;
+    color: white;
+}
+input::placeholder {
+    color: white !important;
+}
+.form-select {
+    background-color: black;
+    border-color: #4b209e;
+    color: white;
+}
+
+/* Contenedor para imágenes que necesitan ser centradas y con tamaño controlado */
+.image-container {
+    margin: 3rem auto; /* Añade espacio alrededor del contenedor de la imagen y lo centra horizontalmente */
+    text-align: center; /* Asegura que el contenido dentro del contenedor esté centrado */
+    max-width: 300px; /* Limita el ancho máximo del contenedor de la imagen. Cambia este valor para hacer el contenedor más grande o más pequeño */
+}
+
+/* Estilos aplicados a las imágenes dentro del contenedor .image-container */
+.image-container img {
+    max-width: 100%; /* La imagen no excederá el tamaño del contenedor */
+    height: auto; /* Mantiene la proporción de la imagen cuando se redimensiona */
+    display: block; /* Hace que la imagen sea un bloque, eliminando cualquier espacio en línea alrededor de la imagen */
+    margin-left: auto; /* Centra la imagen horizontalmente */
+    margin-right: auto; /* Centra la imagen horizontalmente */
+}
+
+/* Estilos personalizados para tarjetas (card) */
+.card-custom {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); /* Añade una sombra para darle profundidad a la tarjeta */
+    border: none; /* Elimina cualquier borde por defecto de la tarjeta */
+}
+
+/* Estilos aplicados al cuerpo de las tarjetas dentro de .card-custom */
+.card-custom .card-body {
+    padding: 2rem; /* Añade un relleno (padding) alrededor del contenido dentro de la tarjeta */
+}
+
+/* Color de texto personalizado utilizado para resaltar elementos importantes */
+.text-primary-custom {
+    color: #4b209e; /* Este es el color azul estándar de Bootstrap. Cambia este valor si quieres otro color */
+}
+
+/* Estilos personalizados para botones */
+.btn {
+    background-color: #4b209e; /* Establece el color de fondo del botón. Cambia este valor para un color diferente */
+    font-size: 1.25rem; /* Tamaño de la fuente dentro del botón. Ajusta este valor para cambiar el tamaño del texto en el botón */
+    width: 150px; /* Hace que el botón ocupe el 100% del ancho de su contenedor */
+    color: white;
+    background-origin: padding-box;
+    border-color: #4b209e
+}
+
+/* Estilos aplicados a los textos que se escriben automáticamente, como los de loop daily */
+#loop-text, #loop-list-text {
+    font-size: 2rem; /* Establece el tamaño del texto. Ajusta este valor para hacerlo más grande o más pequeño */
+    color: #007bff; /* Color del texto. Puedes cambiar este valor para un color diferente */
+    text-align: center; /* Centra el texto horizontalmente */
+    margin: 2rem 0; /* Añade espacio arriba y abajo del texto. Cambia estos valores para ajustar el espaciado */
+    height: 2.5rem; /* Establece una altura fija suficiente para contener el texto completo */
+    overflow: hidden; /* Evita que el texto desborde el contenedor */
+    white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+}
+
+table {
+    width: 100%;
+    background-color: #0a0a0a; /* Fondo negro */
+    color: white !important; /* Texto blanco */
+    border-collapse: collapse; /* Combina bordes entre celdas */
+    border-color: white;
+  }
+
+td a {
+    text-decoration: none;
+    color: white;
+}
+
+.col-md-3 {
+    width: 15%;
+}
+.loop-info {
+    display: flex;
+    align-items: center;
+}
+
+.title-and-play {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espacio entre el título y el botón */
+}
+
+.play-button {
+    margin-left: 10px;
+}
+
+.waveform {
+    width: 300px;
+}
+
+.swiper {
+    width: 100%;
+    height: 255px;
+  }
+
+.swiper-slide {
+    width: 200px !important;
+    text-align: center;
+    height: 200px;
+    font-size: 18px;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #80808000;
+    margin-right: 30px;
+    padding: 15px;
+    border-radius: 5%;
+}
+
+.slide-content img {
+  display: block;
+  width: 100%;
+  height: 160px;
+  object-fit: cover;                      
+}
+.slide-content h4 {
+    color: white;
+    font-size: 17px;
+    font-weight: 700;
+    margin-right: 0;
+    margin-top: 13px;
+    text-align: left;
+}
+.slide-content p {
+    color: white;
+    font-size: 14px;
+    margin-right: 0;
+    text-align: left;
+}

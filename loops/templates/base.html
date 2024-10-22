@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es"> <!-- Define el idioma del documento como español -->
+<head>
+    <meta charset="UTF-8"> <!-- Establece la codificacion de caracteres del documento a UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Asegura que el sitio web sea responsivo en dispositivos moviles -->
+    <title>LOOP DAILY</title> <!-- Titulo de la pagina que se mostrara en la pestaña del navegador -->
+    
+    <!-- Carga las etiquetas y archivos estaticos necesarios de Django -->
+    {% load static %}
+    
+    <!-- Enlace al archivo CSS de Bootstrap para estilos predeterminados y responsivos -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Enlace al archivo CSS personalizado para estilos adicionales -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    
+    <!-- Establece un favicon para la pagina -->
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+
+    <!-- Cargar fuentes de Google Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <!-- Link Swiper's CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
+    <style>
+        /* Asegura que los estilos de paginación tengan suficiente prioridad */
+        .swiper-container {
+            padding-bottom: 50px; /* Aumenta el espacio total en el contenedor */
+        }
+
+        .swiper-pagination {
+            bottom: -5px !important; /* Mueve el punto de paginación más abajo */
+        }
+
+        .swiper-slide {
+            margin-bottom: 50px; /* Aumenta el espacio debajo de cada slide para dar más espacio */
+        }
+    </style>
+</head>
+<body>
+    <!-- Navegacion principal del sitio web -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <!-- Nombre de la marca o logo en la barra de navegacion -->
+            <a class="navbar-brand">Crew House</a>
+            
+            <!-- Boton para colapsar la barra de navegacion en dispositivos moviles -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Seccion colapsable de la barra de navegacion -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Lista de elementos de navegacion a la izquierda -->
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <!-- Enlace a la pagina principal -->
+                        <a class="nav-link" href="{% url 'loop_list' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <!-- Enlace a la pagina para subir loops -->
+                        <a class="nav-link" href="{% url 'upload_loop' %}">Sounds</a>
+                    </li>
+                    <li class="nav-item">
+                        <!-- Enlace a la pagina para subir loops -->
+                        <a class="nav-link" href="{% url 'upload_loop' %}">Pricing</a>
+                    </li>
+                </ul>
+                
+                <!-- Lista de elementos de navegacion a la derecha -->
+                <ul class="navbar-nav ms-auto">
+                    <!-- Verifica si el usuario esta autenticado -->
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <!-- Enlace al perfil del usuario autenticado -->
+                            <a class="nav-link" href="{% url 'profile' %}">Mi Perfil</a>
+                        </li>
+                        <li class="nav-item d-flex align-items-center">
+                            <!-- Formulario para cerrar sesion -->
+                            <form method="post" action="{% url 'logout' %}" class="d-flex align-items-center" style="margin: 0; padding: 0;">
+                                {% csrf_token %}
+                                <!-- Boton para cerrar sesion -->
+                                <button type="submit" class="btn btn-link nav-link p-0 m-0" style="color: inherit; text-decoration: none;">Cerrar Sesion</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <!-- Enlace a la pagina de inicio de sesion -->
+                            <a class="nav-link" href="{% url 'login' %}">Iniciar Sesion</a>
+                        </li>
+                        <li class="nav-item">
+                            <!-- Enlace a la pagina de registro -->
+                            <a class="nav-link" href="{% url 'signup' %}">Registrarse</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="title">
+        <h1>Loops & Samples</h1>
+    </div>
+
+    <!-- Bloque opcional para mostrar una imagen en la parte superior de la pagina -->
+    <!--
+    {% block image %}
+    <div class="container image-container">
+        <img src="{% static 'images/portada.webp' %}" alt="portada" class="img-fluid">
+    </div>
+    {% endblock %}
+    -->
+    
+    <!-- Contenedor principal de contenido de la pagina -->
+    <div class="container mt-5">
+        {% block content %}
+        {% endblock %}
+    </div>
+    
+    <!-- Enlace al archivo JavaScript de Bootstrap para funcionalidades interactivas -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/6.2.0/wavesurfer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+</body>
+</html>

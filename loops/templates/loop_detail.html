@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block image %}
+<!-- Sobrescribimos el bloque de imagen para evitar que la imagen de portada se muestre -->
+{% endblock %}
+
+{% block content %}
+<!-- Contenedor principal con margen superior -->
+<div class="container mt-5 text-center">
+    <!-- Información del loop con la imagen del loop o del usuario -->
+    <div class="mb-3">
+        <!-- Mostrar la imagen del loop si está disponible -->
+        {% if loop.image %}
+            <img src="{{ loop.image.url }}" class="img-thumbnail" style="width: 150px; height: 150px; object-fit: cover; margin-bottom: 10px;">
+        <!-- Si no hay imagen del loop, mostrar la imagen del usuario -->
+        {% elif loop.user.userprofile.profile_picture %}
+            <img src="{{ loop.user.userprofile.profile_picture.url }}" class="img-thumbnail" style="width: 150px; height: 150px; object-fit: cover; margin-bottom: 10px;">
+        <!-- Si tampoco hay imagen del usuario, mostrar la imagen predeterminada -->
+        {% else %}
+            <img src="{% static 'default_profile.png' %}" class="img-thumbnail" style="width: 150px; height: 150px; object-fit: cover; margin-bottom: 10px;">
+        {% endif %}
+        
+        <div>
+            <a href="{% url 'profile' %}?user_id={{ loop.user.id }}" class="text-decoration-none d-block mt-2">
+                <strong>{{ loop.user.username }}</strong>
+            </a>
+        </div>
+    </div>
+
+    <!-- Muestra el título del loop centrado -->
+    <h2>{{ loop.title }}</h2>
+    <!-- Muestra la descripción del loop centrado -->
+    <p>{{ loop.description }}</p>
+
+    <!-- Reproductor de audio centrado -->
+    <div>
+        <audio controls>
+            <source src="{{ loop.file.url }}" type="audio/mpeg">
+            Tu navegador no soporta el elemento de audio.
+        </audio>
+    </div>
+
+    <!-- Botón para dar "Me gusta" centrado -->
+    <div class="mt-3">
+        <a href="{% url 'like_loop' loop.id %}" class="btn btn-outline-primary">
+            <!-- Verifica si el usuario ha dado "Me gusta" y muestra el icono correspondiente -->
+            {% if user in loop.likes.all %}
+                <i class="fas fa-thumbs-up"></i> Me gusta ({{ loop.total_likes }})
+            {% else %}
+                <i class="far fa-thumbs-up"></i> Me gusta ({{ loop.total_likes }})
+            {% endif %}
+        </a>
+    </div>
+
+    <hr>
+
+    <!-- Sección de comentarios -->
+    <h3>Comentarios</h3>
+    <div class="comments">
+        <!-- Itera a través de los comentarios y los muestra -->
+        {% for comment in comments %}
+        <div class="comment mb-3 d-flex align-items-center">
+            {% if comment.user.userprofile.profile_picture %}
+                <img src="{{ comment.user.userprofile.profile_picture.url }}" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+            {% else %}
+                <img src="{% static 'default_profile.png' %}" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+            {% endif %}
+            <div>
+                <!-- Muestra el nombre del usuario y la fecha/hora del comentario -->
+                <p class="mb-1"><a href="{% url 'profile' %}?user_id={{ comment.user.id }}" class="text-decoration-none"><strong>{{ comment.user.username }}</strong></a> - {{ comment.created_at|date:"d M Y H:i" }}</p>
+                <!-- Muestra el texto del comentario -->
+                <p>{{ comment.text }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <!-- Formulario para agregar un nuevo comentario -->
+    <h4>Añadir un comentario</h4>
+    {% if user.is_authenticated %}
+    <form method="post">
+        <!-- Token CSRF para seguridad en el formulario -->
+        {% csrf_token %}
+        <!-- Muestra el formulario de comentario -->
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Enviar</button>
+    </form>
+    {% else %}
+    <!-- Muestra un mensaje pidiendo al usuario que inicie sesión para comentar -->
+    <p><a href="{% url 'login' %}">Inicia sesión</a> para dejar un comentario.</p>
+    {% endif %}
+</div>
+{% endblock %}

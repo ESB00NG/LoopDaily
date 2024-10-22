@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Contenedor principal con margen superior -->
+<div class="container mt-5">
+    <!-- Titulo de la pagina para confirmar la eliminacion -->
+    <h2>¿Estas seguro de que deseas eliminar este loop?</h2>
+    <!-- Muestra el titulo del loop a eliminar -->
+    <p><strong>{{ loop.title }}</strong></p>
+    <!-- Formulario para confirmar la eliminacion -->
+    <form method="post">
+        <!-- Token CSRF para seguridad en el formulario -->
+        {% csrf_token %}
+        <!-- Boton para confirmar la eliminacion del loop -->
+        <button type="submit" class="btn btn-danger">Si, eliminar</button>
+        <!-- Enlace para cancelar la accion y regresar al perfil -->
+        <a href="{% url 'profile' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

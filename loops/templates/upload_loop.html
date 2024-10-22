@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block image %}
+<!-- Contenedor para la imagen de portada -->
+<div class="container image-container">
+    <img src="{% static 'images/portadaUpload.webp' %}" alt="portadaUpload" class="img-fluid">
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card card-custom">
+                <div class="card-body">
+                    <h2 id="upload-loop-text" class="text-center text-primary-custom mb-4" style="min-height: 1.5em;"></h2>
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <label for="title" class="form-label">Titulo:</label>
+                            {{ form.title }}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="description" class="form-label">Descripcion:</label>
+                            {{ form.description }}
+                        </div>
+
+                        <div class="mb-4 row">
+                            <div class="col-md-6">
+                                <label for="bpm" class="form-label">BPM:</label>
+                                {{ form.bpm }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="escala" class="form-label">Escala:</label>
+                                {{ form.escala }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="categoria" class="form-label">Categoria:</label>
+                            {{ form.categoria }}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="file" class="form-label">Archivo de audio:</label>
+                            {{ form.file }}
+                        </div>
+
+                        <!-- Campo para la imagen del loop -->
+                        <div class="mb-4">
+                            <label for="image" class="form-label">Foto del Loop:</label>
+                            {{ form.image }}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-custom">Subir Loop</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const textElement = document.getElementById('upload-loop-text');
+    const text = "SUBIR NUEVO LOOP";
+    let index = 0;
+    let isAdding = true;
+
+    function playText() {
+        textElement.innerText = text.slice(0, index);
+
+        if (isAdding) {
+            if (index < text.length) {
+                index++;
+                setTimeout(playText, 120);
+            } else {
+                isAdding = false;
+                setTimeout(playText, 1000);
+            }
+        } else {
+            if (index > 0) {
+                index--;
+                setTimeout(playText, 100);
+            } else {
+                isAdding = true;
+                setTimeout(playText, 200);
+            }
+        }
+    }
+
+    playText();
+  });
+</script>
+{% endblock %}

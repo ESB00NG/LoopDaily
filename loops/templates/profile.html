@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block image %}
+<!-- Bloque de imagen vacío para evitar cargar la imagen de portada en el perfil -->
+{% endblock %}
+
+{% block content %}
+<!-- Fila centrada que contiene la imagen de perfil -->
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8 text-center">
+        <!-- Muestra la imagen de perfil -->
+        {% if user.userprofile.profile_picture %}
+            <!-- Si el usuario tiene una imagen de perfil, se muestra -->
+            <img src="{{ user.userprofile.profile_picture.url }}" class="img-thumbnail" style="max-width: 200px; max-height: 200px; object-fit: cover; margin-bottom: 10px;">
+        {% else %}
+            <!-- Si no tiene imagen de perfil, se muestra una imagen predeterminada -->
+            <img src="{% static 'default_profile.png' %}" class="img-thumbnail" style="max-width: 200px; max-height: 200px; object-fit: cover; margin-bottom: 10px;">
+        {% endif %}
+    </div>
+</div>
+
+<!-- Fila centrada que contiene el texto LOOP DAILY -->
+<div class="row justify-content-center mt-2">
+    <div class="col-md-8 text-center">
+        <!-- Texto LOOP DAILY con animación de escritura -->
+        <h1 id="loop-text" class="text-primary-custom animated-text">LOOP DAILY</h1>
+    </div>
+</div>
+
+<!-- Fila centrada que contiene el formulario para cambiar la foto de perfil y la información del usuario -->
+<div class="row justify-content-center mt-4">
+    {% if request.user.id == user.id %}
+    <!-- Si el usuario actual está viendo su propio perfil -->
+    <div class="col-md-4">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <!-- Campo para subir la imagen de perfil -->
+                {{ profile_form.profile_picture.label_tag }} {{ profile_form.profile_picture }}
+            </div>
+            <button type="submit" class="btn btn-primary">Actualizar perfil</button>
+        </form>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Información del perfil del usuario -->
+        <h2 class="text-left">Perfil de {{ user.username }}</h2>
+        <p class="text-left"><strong>Email:</strong> {{ user.email }}</p>
+        <p class="text-left"><strong>Fecha de registro:</strong> {{ user.date_joined }}</p>
+    </div>
+    {% else %}
+    <!-- Si el usuario actual está viendo el perfil de otro usuario -->
+    <div class="col-md-8 text-center">
+        <h2 class="text-center">Perfil de {{ user.username }}</h2>
+        <p class="text-center"><strong>Email:</strong> {{ user.email }}</p>
+        <p class="text-center"><strong>Fecha de registro:</strong> {{ user.date_joined }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Fila centrada que contiene la información del perfil del usuario -->
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <h3 class="mt-4 text-uppercase text-center">Tus Loops Subidos</h3>
+        {% if user_loops.exists %}
+        <!-- Tabla que lista los loops subidos por el usuario -->
+        <table class="table table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Descripción</th>
+                    <th>BPM</th>
+                    <th>Escala</th>
+                    <th>Categoría</th>
+                    <th>Reproducir</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for loop in user_loops %}
+                <tr>
+                    <!-- Detalles de cada loop subido -->
+                    <td>{{ loop.title }}</td>
+                    <td>{{ loop.description }}</td>
+                    <td>{{ loop.bpm }}</td>
+                    <td>{{ loop.escala }}</td>
+                    <td>{{ loop.categoria }}</td>
+                    <td>
+                        <!-- Reproductor de audio para el loop -->
+                        <audio controls class="loop-audio">
+                            <source src="{{ loop.file.url }}" type="audio/mpeg">
+                            Tu navegador no soporta el elemento de audio.
+                        </audio>
+                    </td>
+                    <td>
+                        {% if loop.user == request.user %}
+                        <!-- Botón para eliminar el loop, solo visible para el usuario que subió el loop -->
+                        <form method="post" action="{% url 'delete_loop' loop.id %}">
+                            {% csrf_token %}
+                            <button type="button" class="btn btn-danger delete-loop-button">Eliminar</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <!-- Mensaje si el usuario no ha subido ningún loop -->
+        <p class="text-center">No has subido ningún loop aún.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de confirmación para la eliminación de un loop -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirmar eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro de que quieres eliminar este loop?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" id="confirmDeleteButton" class="btn btn-danger">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Manejo de la confirmación de eliminación de loops
+    const deleteButtons = document.querySelectorAll('.delete-loop-button');
+    const confirmDeleteButton = document.getElementById('confirmDeleteButton');
+    let formToSubmit;
+
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function(event) {
+        event.preventDefault();
+        formToSubmit = button.closest('form');
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
+        deleteModal.show();
+      });
+    });
+
+    confirmDeleteButton.addEventListener('click', function() {
+      if (formToSubmit) {
+        formToSubmit.submit();
+      }
+    });
+
+    // Animación para el texto "LOOP DAILY"
+    const loopText = document.getElementById('loop-text');
+    const text = loopText.textContent;
+    loopText.textContent = '';
+
+    let index = 0;
+    const typewriter = setInterval(function() {
+      if (index < text.length) {
+        loopText.textContent += text[index];
+        index++;
+      } else {
+        clearInterval(typewriter);
+      }
+    }, 100); // Velocidad de la animación de escritura
+
+    // Asegurar que solo un audio se reproduzca a la vez
+    const audios = document.querySelectorAll('.loop-audio');
+    audios.forEach(audio => {
+      audio.addEventListener('play', function() {
+        audios.forEach(otherAudio => {
+          if (otherAudio !== audio) {
+            otherAudio.pause();
+            otherAudio.currentTime = 0;
+          }
+        });
+      });
+    });
+  });
+</script>
+
+{% endblock %}

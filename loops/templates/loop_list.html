@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+</div>
+
+<div class="swiper mySwiper">
+    <div class="swiper-wrapper">
+      {% for loop in loops %}
+      <div class="swiper-slide">
+        <div class="slide-content">
+          <!-- Mostrar la imagen del loop si existe, de lo contrario, mostrar la foto del usuario -->
+          {% if loop.image %}
+              <img src="{{ loop.image.url }}" alt="{{ loop.title }}" style="width: 100%;">
+          {% elif loop.user.userprofile.profile_picture %}
+              <img src="{{ loop.user.userprofile.profile_picture.url }}" alt="Profile Picture" style="width: 100%;">
+          {% else %}
+              <img src="{% static 'default_profile.png' %}" alt="Default Profile Picture">
+          {% endif %}
+          <h4>{{ loop.title }}</h4>
+          <p>{{ loop.user.username }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="swiper-pagination"></div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+</div>
+
+<div class="container mt-5">
+    <form method="get" class="row mb-4 justify-content-left">
+        <div class="col-md-3">
+            <input type="text" placeholder="Trending" name="title" id="title" class="form-control" value="{{ request.GET.title }}">
+        </div>
+        <div class="col-md-3">
+            <select name="categoria" id="categoria" class="form-select">
+                <option value="">Género</option>
+                {% for categoria in categorias %}
+                <option value="{{ categoria }}" {% if request.GET.categoria == categoria %}selected{% endif %}>{{ categoria }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="number" placeholder="Instrumentos" name="bpm_min" id="bpm_min" class="form-control" value="{{ request.GET.bpm_min }}">
+        </div>
+        <div class="col-md-3">
+            <input type="number" name="bpm_max" placeholder="Type" id="bpm_max" class="form-control" value="{{ request.GET.bpm_max }}">
+        </div>
+        <div class="col-12 mt-4 d-flex justify-content-center">
+            <button type="submit" class="btn">Filtrar</button>
+        </div>
+    </form>
+
+    <table>
+        <tbody>
+            {% for loop in loops %}
+            <tr>
+                <td>
+                    {% if loop.image %}
+                        <img src="{{ loop.image.url }}" style="width: 50px; height: 50px; margin-right: 10px;">
+                    {% elif loop.user.userprofile.profile_picture %}
+                        <img src="{{ loop.user.userprofile.profile_picture.url }}" style="width: 50px; height: 50px; margin-right: 10px;">
+                    {% else %}
+                        <img src="{% static 'default_profile.png' %}" style="width: 50px; height: 50px; margin-right: 10px;">
+                    {% endif %}
+                    <a href="{% url 'loop_detail' loop.id %}">{{ loop.title }}</a>
+                </td>
+                <td>
+                    <span class="play-pause-btn material-symbols-outlined" data-loop-id="{{ loop.id }}" style="cursor: pointer;">play_arrow</span> <!-- Cursor de puntero añadido -->
+                </td>
+                <td>
+                    <div class="waveform" data-url="{{ loop.file.url }}" data-loop-id="{{ loop.id }}" style="cursor: pointer;"></div> <!-- Cursor de puntero añadido -->
+                </td>
+                <td>{{ loop.bpm }} BPM</td>
+                <td>{{ loop.escala }}</td>
+                <td>
+                    <span class="like-btn" data-loop-id="{{ loop.id }}" style="cursor: pointer;">
+                        {% if user in loop.likes.all %}
+                            <i class="material-symbols-outlined">favorite</i>
+                        {% else %}
+                            <i class="material-symbols-outlined">favorite_border</i>
+                        {% endif %}
+                        <span class="like-count">{{ loop.total_likes }}</span>
+                    </span>
+
+                    <a href="{{ loop.file.url }}" class="material-symbols-outlined" download style="cursor: pointer;">download</a> <!-- Cursor de puntero ya aplicado -->
+                    
+                    <span class="material-symbols-outlined options-btn" data-loop-id="{{ loop.id }}" style="cursor: pointer;">more_vert</span> <!-- Cursor de puntero añadido -->
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]') ? document.querySelector('[name=csrfmiddlewaretoken]').value : null;
+
+        const swiper = new Swiper('.mySwiper', {
+            slidesPerView: 6,
+            spaceBetween: 30,
+            loop: false,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+        });
+
+        let activeWavesurfer = null;
+
+        const waveforms = document.querySelectorAll('.waveform');
+
+        waveforms.forEach(waveform => {
+            const audioUrl = waveform.getAttribute('data-url');
+            const loopId = waveform.getAttribute('data-loop-id');
+
+            const wavesurfer = WaveSurfer.create({
+                container: waveform,
+                waveColor: '#4b209e',
+                progressColor: 'purple',
+                height: 70,
+                responsive: true,
+                cursorWidth: 0
+            });
+
+            wavesurfer.load(audioUrl);
+
+            const playPauseButton = document.querySelector(`.play-pause-btn[data-loop-id="${loopId}"]`);
+
+            function updateIcon() {
+                if (wavesurfer.isPlaying()) {
+                    playPauseButton.innerText = 'pause';
+                } else {
+                    playPauseButton.innerText = 'play_arrow';
+                }
+            }
+
+            playPauseButton.addEventListener('click', function() {
+                if (activeWavesurfer && activeWavesurfer !== wavesurfer) {
+                    activeWavesurfer.pause();
+                    const otherPlayPauseButton = document.querySelector(`.play-pause-btn[data-loop-id="${activeWavesurfer.container.getAttribute('data-loop-id')}"]`);
+                    otherPlayPauseButton.innerText = 'play_arrow';
+                }
+
+                if (wavesurfer.isPlaying()) {
+                    wavesurfer.pause();
+                } else {
+                    wavesurfer.play();
+                    activeWavesurfer = wavesurfer;
+                }
+                updateIcon();
+            });
+
+            wavesurfer.on('finish', function() {
+                playPauseButton.innerText = 'play_arrow';
+                activeWavesurfer = null;
+            });
+        });
+
+        // Funcionalidad de "Me gusta" con actualización de contador e icono
+        document.querySelectorAll('.like-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                let loopId = this.getAttribute('data-loop-id');
+                const likeButton = this;
+                const likeIcon = likeButton.querySelector('.material-symbols-outlined');
+                const likeCountElement = likeButton.querySelector('.like-count');
+
+                fetch(`/loops/like/${loopId}/`, {  
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la solicitud');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'ok') {
+                        // Actualizar el icono dependiendo de si el loop fue marcado como "me gusta" o no
+                        if (data.liked) {
+                            likeIcon.textContent = 'favorite';
+                        } else {
+                            likeIcon.textContent = 'favorite_border';
+                        }
+
+                        // Actualizar el contador de likes dinámicamente
+                        likeCountElement.textContent = data.total_likes;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+
+        // Funcionalidad de opciones
+        document.querySelectorAll('.options-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                let loopId = this.getAttribute('data-loop-id');
+                let menu = document.querySelector(`.options-menu[data-loop-id="${loopId}"]`);
+
+                if (menu.style.display === 'none') {
+                    menu.style.display = 'block';
+                } else {
+                    menu.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}
