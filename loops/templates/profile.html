@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block image %}
+<!-- Bloque de imagen vacío para evitar cargar la imagen de portada en el perfil -->
+{% endblock %}
+
+{% block content %}
+<!-- Fila centrada que contiene la imagen de perfil -->
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8 text-center">
+        <!-- Muestra la imagen de perfil sin borde y más grande -->
+        {% if user.userprofile.profile_picture %}
+            <!-- Si el usuario tiene una imagen de perfil, se muestra -->
+            <img src="{{ user.userprofile.profile_picture.url }}" style="width: 250px; height: 250px; object-fit: cover; margin-bottom: 10px;">
+        {% else %}
+            <!-- Si no tiene imagen de perfil, se muestra una imagen predeterminada -->
+            <img src="{% static 'default_profile.png' %}" style="width: 250px; height: 250px; object-fit: cover; margin-bottom: 10px;">
+        {% endif %}
+    </div>
+</div>
+
+<!-- Fila centrada que contiene el texto LOOP DAILY -->
+<div class="row justify-content-center mt-2">
+    <div class="col-md-8 text-center">
+        <!-- Texto LOOP DAILY con animación de escritura -->
+        <h1 id="loop-text" class="text-primary-custom animated-text">LOOP DAILY</h1>
+    </div>
+</div>
+
+<!-- Lista de loops del usuario con el mismo estilo que loop_list -->
+<div class="container mt-5">
+    <h3 class="mt-4 text-uppercase text-center">Tus Loops Subidos</h3>
+    {% if user_loops.exists %}
+    <table>
+        <tbody>
+            {% for loop in user_loops %}
+            <tr>
+                <td>
+                    <!-- Mostrar la imagen del loop si está disponible -->
+                    {% if loop.image %}
+                        <img src="{{ loop.image.url }}" style="width: 50px; height: 50px; margin-right: 10px;">
+                    {% elif loop.user.userprofile.profile_picture %}
+                        <img src="{{ loop.user.userprofile.profile_picture.url }}" style="width: 50px; height: 50px; margin-right: 10px;">
+                    {% else %}
+                        <img src="{% static 'default_profile.png' %}" style="width: 50px; height: 50px; margin-right: 10px;">
+                    {% endif %}
+                    <a href="{% url 'loop_detail' loop.id %}">{{ loop.title }}</a>
+                </td>
+                <td>
+                    <span class="play-pause-btn material-symbols-outlined" data-loop-id="{{ loop.id }}">play_arrow</span>
+                </td>
+                <td>
+                    <div class="waveform-container">
+                        <div class="waveform" data-url="{{ loop.file.url }}" data-loop-id="{{ loop.id }}"></div>
+                        <span class="audio-duration" id="duration-{{ loop.id }}"></span>
+                    </div>
+                </td>
+                <td>{{ loop.bpm }} BPM</td>
+                <td>{{ loop.escala }}</td>
+                <td>
+                    <span class="like-btn material-symbols-outlined" data-loop-id="{{ loop.id }}" style="cursor: pointer;">
+                        {% if user in loop.likes.all %}
+                            favorite
+                        {% else %}
+                            favorite_border
+                        {% endif %}
+                    </span>
+                    <span class="like-count">{{ loop.total_likes }}</span>
+                    <a href="{{ loop.file.url }}" download class="download-btn material-symbols-outlined" style="cursor: pointer;">
+                        download
+                    </a>
+                    <span class="material-symbols-outlined">
+                        more_vert
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-center">No has subido ningún loop aún.</p>
+    {% endif %}
+</div>
+
+<!-- Información del perfil del usuario y la opción de actualizar imagen de perfil, ahora debajo de la lista de loops -->
+<div class="row justify-content-center mt-4">
+    {% if request.user.id == user.id %}
+    <!-- Si el usuario actual está viendo su propio perfil -->
+    <div class="col-md-4">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <!-- Campo para subir la imagen de perfil -->
+                <label for="profile_picture" class="form-label">Actualizar imagen de perfil:</label>
+                {{ profile_form.profile_picture }}
+            </div>
+            <button type="submit" class="btn btn-primary">Actualizar perfil</button>
+        </form>
+    </div>
+    <div class="col-md-4">
+        <!-- Información del perfil del usuario -->
+        <h2 class="text-left">Perfil de {{ user.username }}</h2>
+        <p class="text-left"><strong>Email:</strong> {{ user.email }}</p>
+        <p class="text-left"><strong>Fecha de registro:</strong> {{ user.date_joined }}</p>
+    </div>
+    {% else %}
+    <div class="col-md-8 text-center">
+        <h2 class="text-center">Perfil de {{ user.username }}</h2>
+        <p class="text-center"><strong>Email:</strong> {{ user.email }}</p>
+        <p class="text-center"><strong>Fecha de registro:</strong> {{ user.date_joined }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Script para manejar la reproducción de audio y "Me gusta" -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const waveforms = document.querySelectorAll('.waveform');
+        let activeWavesurfer = null;
+
+        waveforms.forEach(waveform => {
+            const audioUrl = waveform.getAttribute('data-url');
+            const loopId = waveform.getAttribute('data-loop-id');
+
+            const wavesurfer = WaveSurfer.create({
+                container: waveform,
+                waveColor: '#4b209e',
+                progressColor: 'purple',
+                height: 70,
+                responsive: true,
+                cursorWidth: 0
+            });
+
+            wavesurfer.load(audioUrl);
+            const playPauseButton = document.querySelector(`.play-pause-btn[data-loop-id="${loopId}"]`);
+
+            function updateIcon() {
+                playPauseButton.innerText = wavesurfer.isPlaying() ? 'pause' : 'play_arrow';
+            }
+
+            playPauseButton.addEventListener('click', function() {
+                if (activeWavesurfer && activeWavesurfer !== wavesurfer) {
+                    activeWavesurfer.pause();
+                    const otherButton = document.querySelector(`.play-pause-btn[data-loop-id="${activeWavesurfer.container.getAttribute('data-loop-id')}"]`);
+                    otherButton.innerText = 'play_arrow';
+                }
+                if (wavesurfer.isPlaying()) {
+                    wavesurfer.pause();
+                } else {
+                    wavesurfer.play();
+                    activeWavesurfer = wavesurfer;
+                }
+                updateIcon();
+            });
+
+            wavesurfer.on('finish', function() {
+                updateIcon();
+                activeWavesurfer = null;
+            });
+        });
+
+        document.querySelectorAll('.like-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const loopId = this.getAttribute('data-loop-id');
+                const likeIcon = this;
+                const likeCount = this.nextElementSibling;
+
+                fetch(`/loops/like/${loopId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        likeIcon.textContent = data.liked ? 'favorite' : 'favorite_border';
+                        likeCount.textContent = data.total_likes;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+<form method="get" class="row mb-4 justify-content-left">
+    <div class="col-md-3">
+        <input type="text" placeholder="Buscar por título" name="title" id="title" class="form-control" value="{{ request.GET.title }}">
+    </div>
+    <div class="col-md-3">
+        <select name="categoria" id="categoria" class="form-select">
+            <option value="">Filtrar por género</option>
+            {% for categoria in categorias %}
+            <option value="{{ categoria }}" {% if request.GET.categoria == categoria %}selected{% endif %}>{{ categoria }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <!-- Input group para BPM mínimo y máximo en un solo cajón -->
+    <div class="col-md-3">
+        <div class="input-group bpm-input-group">
+            <input type="number" name="bpm_min" id="bpm_min" class="form-control" placeholder="BPM" value="{{ request.GET.bpm_min }}">
+            <span class="input-group-text">-</span>
+            <input type="number" name="bpm_max" id="bpm_max" class="form-control" placeholder="BPM" value="{{ request.GET.bpm_max }}">
+        </div>
+    </div>
+    <div class="col-12 mt-4 d-flex justify-content-center">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </div>
+</form>

@@ -1,0 +1,283 @@
+/* Establece la fuente predeterminada para todo el cuerpo del documento */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #0a0a0a; /* Cambia el color de fondo a azul */
+}
+.container {
+    max-width: 1460px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+.title {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.title h2 {
+    color: #d2d2d2;
+    font-size: 23px;
+    font-weight: 700;
+    margin-top: 34px;
+}
+h1 {
+    color: white;
+    text-align: center;
+    font-weight: 800;
+    font-size: 64px;
+}
+/* Estilo para el botón de "Registrarse" */
+.signup-btn {
+    display: inline-block;
+    background-color: #e9e8eb;
+    border-radius: 10px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+.signup-btn a {
+    color: #000 !important;
+}
+/* Asegurarse de que el color de fondo y el borde sean iguales a los campos de BPM */
+.bpm-input-group .input-group-text {
+    background-color: black; /* Igualar color al de los inputs */
+    border-color: #4b209e;    /* Color del borde */
+    color: white;             /* Color del texto */
+    padding: 0 10px;          /* Añadir algo de padding a los lados */
+    border-radius: 0;         /* Evitar bordes redondeados */
+}
+
+.bpm-input-group input {
+    background-color: black; /* Igualar el color de fondo */
+    border-color: #4b209e;   /* Igualar el color del borde */
+    color: white;            /* Igualar el color del texto */
+}
+
+/* Ajustar el tamaño del botón y centrar el texto */
+.signup-btn:hover {
+    background-color: #f9f8f9;       /* Color más oscuro al pasar el ratón */
+    color: #fff;                     /* Texto en blanco al pasar el ratón */
+}
+
+.navbar-brand {
+    font-weight: 800;
+}
+/* Ajusta el tamaño de la fuente de los elementos de la barra de navegación, incluyendo el nombre de la marca y los enlaces */
+.navbar-brand, .nav-link {
+    font-size: 1.4rem; /* Puedes aumentar o disminuir este valor para cambiar el tamaño del texto en la barra de navegación */
+}
+
+.navbar {
+    background-color: #0a0a0a;
+    padding-top: 15px;
+    padding-left: 20px;
+}
+
+.nav-link {
+    color: white;
+}
+
+.form-label {
+    color: white;
+}
+.form-control {
+    background-color: black;
+    border-color: #4b209e;
+    width: 390px;
+    color: white;
+}
+input::placeholder {
+    color: white !important;
+}
+.form-select {
+    background-color: black;
+    border-color: #4b209e;
+    color: white;
+}
+
+/* Contenedor para imágenes que necesitan ser centradas y con tamaño controlado */
+.image-container {
+    margin: 3rem auto; /* Añade espacio alrededor del contenedor de la imagen y lo centra horizontalmente */
+    text-align: center; /* Asegura que el contenido dentro del contenedor esté centrado */
+    max-width: 300px; /* Limita el ancho máximo del contenedor de la imagen. Cambia este valor para hacer el contenedor más grande o más pequeño */
+}
+
+/* Estilos aplicados a las imágenes dentro del contenedor .image-container */
+.image-container img {
+    max-width: 100%; /* La imagen no excederá el tamaño del contenedor */
+    height: auto; /* Mantiene la proporción de la imagen cuando se redimensiona */
+    display: block; /* Hace que la imagen sea un bloque, eliminando cualquier espacio en línea alrededor de la imagen */
+    margin-left: auto; /* Centra la imagen horizontalmente */
+    margin-right: auto; /* Centra la imagen horizontalmente */
+}
+
+/* Estilos personalizados para tarjetas (card) */
+.card-custom {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); /* Añade una sombra para darle profundidad a la tarjeta */
+    border-width: 3px;
+    border-color: #454545;
+}
+
+/* Estilos aplicados al cuerpo de las tarjetas dentro de .card-custom */
+.card-custom .card-body {
+    padding: 2rem; /* Añade un relleno (padding) alrededor del contenido dentro de la tarjeta */
+}
+
+/* Color de texto personalizado utilizado para resaltar elementos importantes */
+.text-primary-custom {
+    color: #4b209e; /* Este es el color azul estándar de Bootstrap. Cambia este valor si quieres otro color */
+}
+
+/* Estilos personalizados para botones */
+.btn {
+    background-color: #4b209e; /* Establece el color de fondo del botón. Cambia este valor para un color diferente */
+    font-size: 1.25rem; /* Tamaño de la fuente dentro del botón. Ajusta este valor para cambiar el tamaño del texto en el botón */
+    width: 150px; /* Hace que el botón ocupe el 100% del ancho de su contenedor */
+    color: white;
+    background-origin: padding-box;
+    border-color: #4b209e
+}
+
+/* Estilos aplicados a los textos que se escriben automáticamente, como los de loop daily */
+#loop-text, #loop-list-text {
+    font-size: 2rem; /* Establece el tamaño del texto. Ajusta este valor para hacerlo más grande o más pequeño */
+    color: #007bff; /* Color del texto. Puedes cambiar este valor para un color diferente */
+    text-align: center; /* Centra el texto horizontalmente */
+    margin: 2rem 0; /* Añade espacio arriba y abajo del texto. Cambia estos valores para ajustar el espaciado */
+    height: 2.5rem; /* Establece una altura fija suficiente para contener el texto completo */
+    overflow: hidden; /* Evita que el texto desborde el contenedor */
+    white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+}
+
+table {
+    width: 100%;
+    background-color: #0a0a0a; /* Fondo negro */
+    color: white !important; /* Texto blanco */
+    border-collapse: collapse; /* Combina bordes entre celdas */
+    border-color: white;
+  }
+
+td a {
+    text-decoration: none;
+    color: white;
+}
+
+.col-md-3 {
+    width: 15%;
+}
+.loop-info {
+    display: flex;
+    align-items: center;
+}
+
+.title-and-play {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espacio entre el título y el botón */
+}
+
+.play-button {
+    margin-left: 10px;
+}
+.waveform-container {
+    display: flex;
+    align-items: center;
+}
+.audio-duration {
+    margin-left: 24px;
+    font-size: 14px;
+    color: white;
+    font-weight: 700;     /* Color de la duración */
+}
+
+.waveform {
+    width: 300px;
+}
+
+.swiper {
+    width: 100%;
+    height: 255px;
+    margin-top: 90px;
+  }
+
+.swiper-slide {
+    width: 200px !important;
+    text-align: center;
+    height: 200px;
+    font-size: 18px;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #80808000;
+    margin-right: 30px;
+    border-radius: 5%;
+}
+.slide-content {
+    height: 100%;
+    position: relative;
+    border-radius: 8%;
+    overflow: hidden;
+}
+.slide-content img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   
+}
+.overlay {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    box-sizing: border-box;
+    background-color: #21201ead;
+    padding-left: 10px;
+}
+.slide-content h4 {
+    color: white;
+    font-size: 17px;
+    font-weight: 700;
+    margin-right: 0;
+    margin-top: 13px;
+    text-align: left;
+}
+.slide-content p {
+    color: white;
+    font-size: 14px;
+    margin-right: 0;
+    text-align: left;
+}
+
+/* Estilos del formulario */
+
+.card {
+    background-color: #0a0a0a;
+}
+.card-body h2 {
+    text-align: center;
+        font-size: 47px;
+        color: #4b209e;
+        font-weight: 700;
+        margin-bottom: 36px;
+}
+.form {
+    margin-bottom: 7rem;
+}
+.form-inside {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.col-md-6 {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+.image {
+    width: 505px !important;
+}
+.upload {
+    width: 420px;
+}

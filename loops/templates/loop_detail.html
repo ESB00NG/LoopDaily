@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block image %}
+<!-- Sobrescribimos el bloque de imagen para evitar que la imagen de portada se muestre -->
+{% endblock %}
+
+{% block content %}
+<!-- Contenedor principal con margen superior -->
+<div class="container mt-5 text-center">
+    <!-- Información del usuario que subió el loop -->
+    <div class="mb-3">
+        {% if loop.image %}
+            <img src="{{ loop.image.url }}" class="img-thumbnail" style="width: 450px; height: 450px; object-fit: cover; margin-bottom: 10px;">
+        {% elif loop.user.userprofile.profile_picture %}
+            <img src="{{ loop.user.userprofile.profile_picture.url }}" class="img-thumbnail" style="width: 250px; height: 250px; object-fit: cover; margin-bottom: 10px;">
+        {% else %}
+            <img src="{% static 'default_profile.png' %}" class="img-thumbnail" style="width: 150px; height: 150px; object-fit: cover; margin-bottom: 10px;">
+        {% endif %}
+        
+        <div>
+            <a href="{% url 'profile' %}?user_id={{ loop.user.id }}" class="text-decoration-none d-block mt-2">
+                <strong style="color: white;">{{ loop.user.username }}</strong> <!-- Texto en blanco -->
+            </a>
+        </div>
+    </div>
+
+    <!-- Muestra el título del loop centrado en blanco -->
+    <h2 style="color: white;">{{ loop.title }}</h2>
+    <!-- Muestra la descripción del loop centrado en blanco -->
+    <p style="color: white;">{{ loop.description }}</p>
+
+    <!-- Reproductor de audio centrado utilizando Wavesurfer -->
+    <div class="waveform-container text-center mt-4">
+        <span class="play-pause-btn material-symbols-outlined" data-loop-id="{{ loop.id }}" style="font-size: 48px; cursor: pointer; color: white;">
+            play_arrow
+        </span>
+        <div class="waveform" data-url="{{ loop.file.url }}" data-loop-id="{{ loop.id }}" style="width: 100%; height: 80px;"></div>
+        <span class="audio-duration" id="duration-{{ loop.id }}" style="color: white;"></span>
+    </div>
+
+    <!-- Botón para dar "Me gusta" centrado con funcionalidad de like sin recargar la página -->
+    <div class="mt-3">
+        <span class="like-btn material-symbols-outlined" data-loop-id="{{ loop.id }}" style="cursor: pointer; color: white;">
+            {% if user in loop.likes.all %}
+                favorite
+            {% else %}
+                favorite_border
+            {% endif %}
+        </span>
+        <span class="like-count" style="color: white;">{{ loop.total_likes }}</span> <!-- Contador en blanco -->
+    </div>
+
+    <hr>
+
+    <!-- Sección de comentarios -->
+    <h3 style="color: white;">Comentarios</h3>
+    <div class="comments">
+        {% for comment in comments %}
+        <div class="comment mb-3 d-flex align-items-center">
+            {% if comment.user.userprofile.profile_picture %}
+                <img src="{{ comment.user.userprofile.profile_picture.url }}" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+            {% else %}
+                <img src="{% static 'default_profile.png' %}" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+            {% endif %}
+            <div>
+                <p class="mb-1">
+                    <a href="{% url 'profile' %}?user_id={{ comment.user.id }}" class="text-decoration-none" style="color: white;">
+                        <strong>{{ comment.user.username }}</strong>
+                    </a>
+                    - {{ comment.created_at|date:"d M Y H:i" }}
+                </p>
+                <p style="color: white;">{{ comment.text }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <!-- Formulario para agregar un nuevo comentario -->
+    <h4 style="color: white;">Añadir un comentario</h4>
+    {% if user.is_authenticated %}
+    <div class="row justify-content-center">
+        <div class="col-md-6"> <!-- Reduce el ancho del formulario para centrarlo mejor -->
+            <form method="post" class="text-center">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary mt-3">Enviar</button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <p><a href="{% url 'login' %}" style="color: white;">Inicia sesión</a> para dejar un comentario.</p>
+    {% endif %}
+</div>
+
+<!-- Script para reproducir audio y manejar "Me gusta" como en loop_list -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const waveform = document.querySelector('.waveform');
+        const audioUrl = waveform.getAttribute('data-url');
+        const loopId = waveform.getAttribute('data-loop-id');
+        
+        // Crear Wavesurfer para detalle
+        const wavesurfer = WaveSurfer.create({
+            container: waveform,
+            waveColor: '#4b209e',
+            progressColor: 'purple',
+            height: 70,
+            responsive: true,
+            cursorWidth: 0
+        });
+
+        // Cargar el archivo de audio en Wavesurfer
+        wavesurfer.load(audioUrl);
+
+        const playPauseButton = document.querySelector(`.play-pause-btn[data-loop-id="${loopId}"]`);
+
+        function updateIcon() {
+            playPauseButton.innerText = wavesurfer.isPlaying() ? 'pause' : 'play_arrow';
+        }
+
+        // Agregar funcionalidad de reproducción y pausa
+        playPauseButton.addEventListener('click', function() {
+            if (wavesurfer.isPlaying()) {
+                wavesurfer.pause();
+            } else {
+                wavesurfer.play();
+            }
+            updateIcon();
+        });
+
+        wavesurfer.on('finish', function() {
+            updateIcon();
+        });
+
+        // Manejar el contador de "Me gusta"
+        document.querySelector('.like-btn').addEventListener('click', function() {
+            const likeIcon = this;
+            const likeCount = likeIcon.nextElementSibling;
+
+            fetch(`/loops/like/${loopId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    likeIcon.textContent = data.liked ? 'favorite' : 'favorite_border';
+                    likeCount.textContent = data.total_likes;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+</script>
+{% endblock %}

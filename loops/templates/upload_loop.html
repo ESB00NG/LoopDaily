@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block image %}
+<!-- Contenedor para la imagen de portada -->
+<div class="container image-container">
+    <img src="{% static 'images/portadaUpload2.webp' %}" alt="portadaUpload2" class="img-fluid">
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center form">
+        <div class="col-md-8">
+            <div class="card card-custom">
+                <div class="card-body">
+                    <h2>Subir nuevo loop</h2>
+                    <form method="post" class="form-inside" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="mb-4 row">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control form-control-lg" name="title" id="title" placeholder="Título" required>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" class="form-control form-control-lg" name="escala" id="escala" placeholder="Género" required>
+                            </div>
+                        </div>
+
+                        <!-- Campo para la descripción del loop -->
+                        <div class="mb-4">
+                            <textarea class="form-control form-control-lg" name="description" id="description" rows="3" placeholder="Describe tu loop" required></textarea>
+                        </div>
+
+                        <div class="mb-4 row">
+                            <div class="col-md-6">
+                                <input type="number" class="form-control form-control-lg" name="bpm" id="bpm" placeholder="BPM" required>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" class="form-control form-control-lg" name="escala" id="escala" placeholder="Escala" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 row">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control form-control-lg" name="categoria" id="categoria" value="Trap" required>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" class="form-control form-control-lg" name="precio" id="precio" placeholder="Precio" required>
+                            </div>
+                        </div>
+
+                        <!-- Campo para el archivo de audio -->
+                        <div class="mb-4">
+                            <input type="file" class="form-control form-control-lg" name="file" id="file" required>
+                            <small class="form-text text-muted">Formatos soportados: WAV, MP3</small>
+                        </div>
+
+                        <!-- Campo para la imagen del loop -->
+                        <div class="mb-4">
+                            <input type="file" class="form-control form-control-lg" name="image" id="image">
+                            <small class="form-text text-muted">Sube una imagen para el loop (opcional)</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-custom">Subir</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

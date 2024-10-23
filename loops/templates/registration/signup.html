@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Regístrate</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form.username.label_tag }}
+                    <input type="text" name="username" class="form-control" id="id_username" required>
+                    <small class="form-text text-muted">Elige un nombre de usuario único.</small>
+                    {% if form.username.errors %}
+                        <div class="text-danger">
+                            {{ form.username.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.email.label_tag }}
+                    <input type="email" name="email" class="form-control" id="id_email" required>
+                    <small class="form-text text-muted">Ingresa una dirección de correo válida.</small>
+                    {% if form.email.errors %}
+                        <div class="text-danger">
+                            {{ form.email.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.password1.label_tag }}
+                    <input type="password" name="password1" class="form-control" id="id_password1" required>
+                    <small class="form-text text-muted">Crea una contraseña segura (al menos 8 caracteres).</small>
+                    {% if form.password1.errors %}
+                        <div class="text-danger">
+                            {{ form.password1.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.password2.label_tag }}
+                    <input type="password" name="password2" class="form-control" id="id_password2" required>
+                    <small class="form-text text-muted">Repite la contraseña para confirmar.</small>
+                    {% if form.password2.errors %}
+                        <div class="text-danger">
+                            {{ form.password2.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+            </form>
+            <p class="text-center mt-3">¿Ya tienes una cuenta? <a href="{% url 'login' %}">Inicia sesión aquí</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

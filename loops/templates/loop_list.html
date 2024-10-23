@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5 text-center"></div>
+
+<!-- Importar el título desde otro archivo -->
+{% include 'loop_title.html' %}
+
+<!-- Importar el swiper de loops desde otro archivo -->
+{% include 'loop_swiper.html' %}
+
+<div class="container mt-5">
+    <!-- Importar el formulario de filtros desde otro archivo -->
+    {% include 'loop_filters.html' %}
+
+    <!-- Lista de loops -->
+    <table>
+        <tbody>
+            {% for loop in loops %}
+            <tr>
+                <td>
+                    <!-- Mostrar la imagen del loop si está disponible -->
+                    {% if loop.image %}
+                        <img src="{{ loop.image.url }}" style="width: 50px; height: 50px; margin-right: 10px;">
+                    {% elif loop.user.userprofile.profile_picture %}
+                        <img src="{{ loop.user.userprofile.profile_picture.url }}" style="width: 50px; height: 50px; margin-right: 10px;">
+                    {% else %}
+                        <img src="{% static 'default_profile.png' %}" style="width: 50px; height: 50px; margin-right: 10px;">
+                    {% endif %}
+                    <a href="{% url 'loop_detail' loop.id %}">{{ loop.title }}</a>
+                </td>
+                <td>
+                    <span class="play-pause-btn material-symbols-outlined" data-loop-id="{{ loop.id }}">play_arrow</span>
+                </td>
+                <td>
+                    <div class="waveform-container">
+                        <div class="waveform" data-url="{{ loop.file.url }}" data-loop-id="{{ loop.id }}"></div>
+                        <span class="audio-duration" id="duration-{{ loop.id }}"></span>
+                    </div>
+                </td>
+                <td>{{ loop.bpm }} BPM</td>
+                <td>{{ loop.escala }}</td>
+                <td>
+                    <span class="like-btn material-symbols-outlined" data-loop-id="{{ loop.id }}" style="cursor: pointer;">
+                        {% if user in loop.likes.all %}
+                            favorite
+                        {% else %}
+                            favorite_border
+                        {% endif %}
+                    </span>
+                    <span class="like-count">{{ loop.total_likes }}</span>
+                    <a href="{{ loop.file.url }}" download class="download-btn material-symbols-outlined" style="cursor: pointer;">
+                        download
+                    </a>
+                    <span class="material-symbols-outlined">
+                        more_vert
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const swiper = new Swiper('.mySwiper', {
+            slidesPerView: 6,
+            spaceBetween: 30,
+            loop: false,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+        });
+
+        const waveforms = document.querySelectorAll('.waveform');
+        let activeWavesurfer = null;
+
+        waveforms.forEach(waveform => {
+            const audioUrl = waveform.getAttribute('data-url');
+            const loopId = waveform.getAttribute('data-loop-id');
+
+            const wavesurfer = WaveSurfer.create({
+                container: waveform,
+                waveColor: '#4b209e',
+                progressColor: 'purple',
+                height: 70,
+                responsive: true,
+                cursorWidth: 0
+            });
+
+            wavesurfer.load(audioUrl);
+            const playPauseButton = document.querySelector(`.play-pause-btn[data-loop-id="${loopId}"]`);
+
+            function updateIcon() {
+                playPauseButton.innerText = wavesurfer.isPlaying() ? 'pause' : 'play_arrow';
+            }
+
+            playPauseButton.addEventListener('click', function() {
+                if (activeWavesurfer && activeWavesurfer !== wavesurfer) {
+                    activeWavesurfer.pause();
+                    const otherButton = document.querySelector(`.play-pause-btn[data-loop-id="${activeWavesurfer.container.getAttribute('data-loop-id')}"]`);
+                    otherButton.innerText = 'play_arrow';
+                }
+                if (wavesurfer.isPlaying()) {
+                    wavesurfer.pause();
+                } else {
+                    wavesurfer.play();
+                    activeWavesurfer = wavesurfer;
+                }
+                updateIcon();
+            });
+
+            wavesurfer.on('finish', function() {
+                updateIcon();
+                activeWavesurfer = null;
+            });
+        });
+
+        document.querySelectorAll('.like-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const loopId = this.getAttribute('data-loop-id');
+                const likeIcon = this;
+                const likeCount = this.nextElementSibling;
+
+                fetch(`/loops/like/${loopId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        likeIcon.textContent = data.liked ? 'favorite' : 'favorite_border';
+                        likeCount.textContent = data.total_likes;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+</script>
+{% endblock %}

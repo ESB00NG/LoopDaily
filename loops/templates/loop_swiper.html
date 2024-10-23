@@ -1,0 +1,28 @@
+{% load static %}
+
+<div class="swiper mySwiper">
+    <div class="swiper-wrapper">
+      {% for loop in loops %}
+      <div class="swiper-slide">
+        <div class="slide-content">
+          <!-- Verifica si el loop tiene una imagen y la muestra. Si no, muestra la imagen de perfil del usuario -->
+          {% if loop.image %}
+            <img src="{{ loop.image.url }}" alt="Loop Image" style="width: 100%;">
+          {% elif loop.user.userprofile.profile_picture %}
+            <img src="{{ loop.user.userprofile.profile_picture.url }}" alt="Profile Picture" style="width: 100%;">
+          {% else %}
+            <img src="{% static 'default_profile.png' %}" alt="Default Profile Picture">
+          {% endif %}
+          
+          <div class="overlay">
+            <h4>{{ loop.title }}</h4>
+            <p>{{ loop.user.username }}</p>
+           </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="swiper-pagination"></div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+</div>
