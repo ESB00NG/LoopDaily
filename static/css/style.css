@@ -5,8 +5,6 @@ body {
 }
 .container {
     max-width: 1460px;
-    padding-left: 1rem;
-    padding-right: 1rem;
 }
 .title {
     display: flex;
@@ -84,7 +82,7 @@ h1 {
 .form-control {
     background-color: black;
     border-color: #4b209e;
-    width: 390px;
+    width: 165px;
     color: white;
 }
 input::placeholder {
@@ -280,4 +278,11 @@ td a {
 }
 .upload {
     width: 420px;
+}
+.body {
+    padding-left: 9rem;
+    padding-right: 9rem;
+}
+.bpm {
+    width: 177px;
 }

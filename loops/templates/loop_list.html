@@ -117,6 +117,17 @@
                 updateIcon();
             });
 
+            wavesurfer.on('ready', function() {
+            const duration = wavesurfer.getDuration();
+            const durationElement = document.getElementById(`duration-${loopId}`);
+            if (durationElement) {
+                // Formatear la duración en minutos y segundos
+                const minutes = Math.floor(duration / 60);
+                const seconds = Math.floor(duration % 60).toString().padStart(2, '0');
+                durationElement.textContent = `${minutes}:${seconds}`;
+            }
+        });
+
             wavesurfer.on('finish', function() {
                 updateIcon();
                 activeWavesurfer = null;
